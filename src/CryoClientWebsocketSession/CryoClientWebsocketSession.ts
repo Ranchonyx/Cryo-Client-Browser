@@ -220,7 +220,7 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
 
         this.AttachListenersToSocket(socket);
 
-        this.emit("connected", undefined);
+        setTimeout(() => this.emit("connected", undefined), 0);
     }
 
     private AttachListenersToSocket(socket: WebSocket) {
@@ -247,7 +247,7 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
         const full_host_url = new URL(host);
         full_host_url.searchParams.set("authorization", `Bearer ${bearer}`);
         full_host_url.searchParams.set("x-cryo-sid", sid);
-        const sck = new WebSocket(host);
+        const sck = new WebSocket(full_host_url);
         sck.binaryType = "arraybuffer";
 
         return new Promise<WebSocket>((resolve, reject) => {
