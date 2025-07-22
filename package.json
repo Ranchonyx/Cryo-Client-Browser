@@ -1,6 +1,6 @@
 {
   "name": "cryo-client-web",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "keywords": [],
   "license": "ISC",
   "description": "",
@@ -10,7 +10,7 @@
     "email": "info@fjanetzki.nrw"
   },
   "repository": {
-    "url": "https://github.com/Ranchonyx/Cryo-Client"
+    "url": "https://github.com/Ranchonyx/Cryo-Client-Browser"
   },
   "exports": {
     ".": {
