@@ -6,11 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="885f51e0-5033-41af-998e-a7f0e6dd43cb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/lib/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/index.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/lib/index.js.map" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Common/CryoBinaryMessage/CryoBinaryMessageFormatterFactory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Common/CryoBinaryMessage/CryoBinaryMessageFormatterFactory.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,6 +91,8 @@
       <workItem from="1753172116086" duration="39000" />
       <workItem from="1753172592379" duration="160000" />
       <workItem from="1753172832582" duration="86000" />
+      <workItem from="1753175943254" duration="17000" />
+      <workItem from="1753259426093" duration="10000" />
     </task>
     <servers />
   </component>

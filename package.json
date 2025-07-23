@@ -1,6 +1,6 @@
 {
   "name": "cryo-client-web",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "keywords": [],
   "license": "ISC",
   "description": "",
@@ -18,7 +18,7 @@
       "types": "./dist/typings/index.d.ts"
     }
   },
-  "dependencies": {
+  "devDependencies": {
     "esbuild": "^0.25.8"
   },
   "type": "module",

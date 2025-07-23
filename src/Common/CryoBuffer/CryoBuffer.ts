@@ -15,7 +15,7 @@ export class CryoBuffer {
 
         const data = new Uint8Array(input.length / 2);
         for (let i = 0; i < data.length; i++)
-            data[i] = parseInt(input.substring(i * 2, i * 2 + 16), 16);
+            data[i] = parseInt(input.substring(i * 2, i * 2 + 2), 16);
 
         return new CryoBuffer(data);
     }
@@ -25,7 +25,7 @@ export class CryoBuffer {
     }
 
     public writeUInt8(value: number, offset: number): void {
-        this.view.setInt8(offset, value);
+        this.view.setUint8(offset, value);
     }
 
     public readUInt32BE(offset: number): number {
