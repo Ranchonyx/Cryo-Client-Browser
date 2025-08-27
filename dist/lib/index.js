@@ -204,7 +204,7 @@ var Cryo = (() => {
       const sid_buf = CryoBufferUtil.sidToCryoBuffer(sid);
       sid_buf.copy(msg_buf, 0);
       msg_buf.writeUInt32BE(ack, 16);
-      msg_buf.writeUInt8(0 /* UTF8DATA */, 20);
+      msg_buf.writeUInt8(4 /* BINARYDATA */, 20);
       msg_buf.set(payload || CryoBuffer.from("null", "utf8"), 21);
       return msg_buf;
     }
@@ -376,6 +376,11 @@ var Cryo = (() => {
     messages_pending_server_ack = /* @__PURE__ */ new Map();
     server_ack_tracker = new AckTracker();
     current_ack = 0;
+    ping_pong_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("ping_pong");
+    ack_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("ack");
+    error_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("error");
+    utf8_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("utf8data");
+    binary_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("binarydata");
     /*
     * Handle an outgoing binary message
     * */
@@ -394,23 +399,22 @@ var Cryo = (() => {
     * Respond to PONG frames with PING and vice versa
     * */
     HandlePingPongMessage(message) {
-      const pingFormatter = CryoBinaryMessageFormatterFactory.GetFormatter("ping_pong");
-      const decodedPingPongMessage = pingFormatter.Deserialize(message);
-      const ping_pongMessage = pingFormatter.Serialize(this.sid, decodedPingPongMessage.ack, decodedPingPongMessage.payload === "pong" ? "ping" : "pong");
+      const decodedPingPongMessage = this.ping_pong_formatter.Deserialize(message);
+      const ping_pongMessage = this.ping_pong_formatter.Serialize(this.sid, decodedPingPongMessage.ack, decodedPingPongMessage.payload === "pong" ? "ping" : "pong");
       this.HandleOutgoingBinaryMessage(ping_pongMessage);
     }
     /*
     * Handling of binary error messages from the server, currently just log it
     * */
     HandleErrorMessage(message) {
-      const decodedErrorMessage = CryoBinaryMessageFormatterFactory.GetFormatter("error").Deserialize(message);
+      const decodedErrorMessage = this.error_formatter.Deserialize(message);
       this.log(decodedErrorMessage.payload);
     }
     /*
     * Locally ACK the pending message if it matches the server's ACK
     * */
     async HandleAckMessage(message) {
-      const decodedAckMessage = CryoBinaryMessageFormatterFactory.GetFormatter("ack").Deserialize(message);
+      const decodedAckMessage = this.ack_formatter.Deserialize(message);
       const ack_id = decodedAckMessage.ack;
       const found_message = this.server_ack_tracker.Confirm(ack_id);
       if (!found_message) {
@@ -424,10 +428,10 @@ var Cryo = (() => {
     * Extract payload from the binary message and emit the message event with the utf8 payload
     * */
     HandleUTF8DataMessage(message) {
-      const decodedDataMessage = CryoBinaryMessageFormatterFactory.GetFormatter("utf8data").Deserialize(message);
+      const decodedDataMessage = this.utf8_formatter.Deserialize(message);
       const payload = decodedDataMessage.payload;
       const sender_sid = decodedDataMessage.sid;
-      const encodedAckMessage = CryoBinaryMessageFormatterFactory.GetFormatter("ack").Serialize(this.sid, decodedDataMessage.ack);
+      const encodedAckMessage = this.ack_formatter.Serialize(this.sid, decodedDataMessage.ack);
       this.HandleOutgoingBinaryMessage(encodedAckMessage);
       this.emit("message-utf8", payload);
     }
@@ -435,10 +439,10 @@ var Cryo = (() => {
     * Extract payload from the binary message and emit the message event with the binary payload
     * */
     HandleBinaryDataMessage(message) {
-      const decodedDataMessage = CryoBinaryMessageFormatterFactory.GetFormatter("binarydata").Deserialize(message);
+      const decodedDataMessage = this.binary_formatter.Deserialize(message);
       const payload = decodedDataMessage.payload;
       const sender_sid = decodedDataMessage.sid;
-      const encodedAckMessage = CryoBinaryMessageFormatterFactory.GetFormatter("ack").Serialize(this.sid, decodedDataMessage.ack);
+      const encodedAckMessage = this.ack_formatter.Serialize(this.sid, decodedDataMessage.ack);
       this.HandleOutgoingBinaryMessage(encodedAckMessage);
       this.emit("message-binary", payload);
     }
@@ -503,6 +507,7 @@ var Cryo = (() => {
             }
           }
         }
+        console.warn(`Gave up on reconnecting to '${this.host}'.`);
         return;
       }
       if (this.socket)
