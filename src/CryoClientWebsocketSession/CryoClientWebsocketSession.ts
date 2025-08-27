@@ -19,6 +19,12 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     private server_ack_tracker: AckTracker = new AckTracker();
     private current_ack = 0;
 
+    private readonly ping_pong_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("ping_pong");
+    private readonly ack_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("ack");
+    private readonly error_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("error");
+    private readonly utf8_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("utf8data");
+    private readonly binary_formatter = CryoBinaryMessageFormatterFactory.GetFormatter("binarydata");
+
     /*
     * Handle an outgoing binary message
     * */
@@ -43,13 +49,10 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     * Respond to PONG frames with PING and vice versa
     * */
     private HandlePingPongMessage(message: CryoBuffer): void {
-        const pingFormatter = CryoBinaryMessageFormatterFactory
-            .GetFormatter("ping_pong");
-
-        const decodedPingPongMessage = pingFormatter
+        const decodedPingPongMessage = this.ping_pong_formatter
             .Deserialize(message);
 
-        const ping_pongMessage = pingFormatter
+        const ping_pongMessage = this.ping_pong_formatter
             .Serialize(this.sid, decodedPingPongMessage.ack, decodedPingPongMessage.payload === "pong" ? "ping" : "pong");
 
         this.HandleOutgoingBinaryMessage(ping_pongMessage);
@@ -59,8 +62,7 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     * Handling of binary error messages from the server, currently just log it
     * */
     private HandleErrorMessage(message: CryoBuffer): void {
-        const decodedErrorMessage = CryoBinaryMessageFormatterFactory
-            .GetFormatter("error")
+        const decodedErrorMessage = this.error_formatter
             .Deserialize(message);
 
         this.log(decodedErrorMessage.payload);
@@ -70,8 +72,7 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     * Locally ACK the pending message if it matches the server's ACK
     * */
     private async HandleAckMessage(message: CryoBuffer): Promise<void> {
-        const decodedAckMessage = CryoBinaryMessageFormatterFactory
-            .GetFormatter("ack")
+        const decodedAckMessage = this.ack_formatter
             .Deserialize(message);
 
         const ack_id = decodedAckMessage.ack;
@@ -91,54 +92,34 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     * Extract payload from the binary message and emit the message event with the utf8 payload
     * */
     private HandleUTF8DataMessage(message: CryoBuffer): void {
-        const decodedDataMessage = CryoBinaryMessageFormatterFactory
-            .GetFormatter("utf8data")
+        const decodedDataMessage = this.utf8_formatter
             .Deserialize(message);
 
         const payload = decodedDataMessage.payload;
         const sender_sid = decodedDataMessage.sid;
 
-        const encodedAckMessage = CryoBinaryMessageFormatterFactory
-            .GetFormatter("ack")
+        const encodedAckMessage = this.ack_formatter
             .Serialize(this.sid, decodedDataMessage.ack);
 
         this.HandleOutgoingBinaryMessage(encodedAckMessage);
-
-/*
-        if (sender_sid !== this.sid)
-*/
-            this.emit("message-utf8", payload);
-/*
-        else
-            this.log("Dropped self-originated DATA message")
-*/
+        this.emit("message-utf8", payload);
     }
 
     /*
     * Extract payload from the binary message and emit the message event with the binary payload
     * */
     private HandleBinaryDataMessage(message: CryoBuffer): void {
-        const decodedDataMessage = CryoBinaryMessageFormatterFactory
-            .GetFormatter("binarydata")
+        const decodedDataMessage = this.binary_formatter
             .Deserialize(message);
 
         const payload = decodedDataMessage.payload;
         const sender_sid = decodedDataMessage.sid;
 
-        const encodedAckMessage = CryoBinaryMessageFormatterFactory
-            .GetFormatter("ack")
+        const encodedAckMessage = this.ack_formatter
             .Serialize(this.sid, decodedDataMessage.ack);
 
         this.HandleOutgoingBinaryMessage(encodedAckMessage);
-
-/*
-        if (sender_sid !== this.sid)
-*/
-            this.emit("message-binary", payload);
-/*
-        else
-            this.log("Dropped self-originated DATA message")
-*/
+        this.emit("message-binary", payload);
     }
 
     /*
@@ -213,6 +194,7 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
                 }
             }
 
+            console.warn(`Gave up on reconnecting to '${this.host}'.`)
             return;
         }
 

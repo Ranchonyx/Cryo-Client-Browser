@@ -10,11 +10,11 @@
     <file url="file://$PROJECT_DIR$/src/Common/CryoBuffer/CryoBuffer.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/Common/CryoEventEmitter/CryoEventEmitter.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/Common/CryoFrameInspector/CryoFrameInspector.ts" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/Common/DebugLogger/CreateDebugLogger.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/Common/Util/CreateDebugLogger.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/Common/Util/Guard.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/CryoClientWebsocketSession/types/CryoClientWebsocketSession.d.ts" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/Util/DebugLogger/CreateDebugLogger.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/Util/Guard.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/index.ts" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/tsconfig.json" charset="UTF-8" />

@@ -5,11 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="885f51e0-5033-41af-998e-a7f0e6dd43cb" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/build.mjs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/lib/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/lib/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/lib/index.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/lib/index.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Common/DebugLogger/CreateDebugLogger.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Util/Guard.ts" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +46,7 @@
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/f.janetzki/FOSSProjects/CryoClientBrowser/git-recovery&quot;,
@@ -62,10 +67,10 @@
       <recent name="C:\Users\f.janetzki\FOSSProjects\CryoClientBrowser\src\Common\Util" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\f.janetzki\FOSSProjects\CryoClientBrowser\src\Util" />
       <recent name="C:\Users\f.janetzki\FOSSProjects\CryoClientBrowser\src\Common\AckTracker" />
       <recent name="C:\Users\f.janetzki\FOSSProjects\CryoClientBrowser\src\Common" />
       <recent name="C:\Users\f.janetzki\FOSSProjects\CryoClientBrowser\src\Common\Util" />
-      <recent name="C:\Users\f.janetzki\FOSSProjects\CryoClientBrowser\src\Util" />
       <recent name="C:\Users\f.janetzki\FOSSProjects\CryoClientBrowser\src\Common\CryoFrameInspector" />
     </key>
   </component>
@@ -98,6 +103,9 @@
       <workItem from="1753259426093" duration="10000" />
       <workItem from="1753260471231" duration="623000" />
       <workItem from="1753261109691" duration="1167000" />
+      <workItem from="1753351219756" duration="71000" />
+      <workItem from="1753355427166" duration="28000" />
+      <workItem from="1753355473239" duration="124000" />
     </task>
     <servers />
   </component>
