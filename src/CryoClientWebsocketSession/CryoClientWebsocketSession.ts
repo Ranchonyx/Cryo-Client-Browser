@@ -104,14 +104,18 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
 
         this.HandleOutgoingBinaryMessage(encodedAckMessage);
 
+/*
         if (sender_sid !== this.sid)
+*/
             this.emit("message-utf8", payload);
+/*
         else
             this.log("Dropped self-originated DATA message")
+*/
     }
 
     /*
-    * Extract payload from the binary message and emit the message event with the utf8 payload
+    * Extract payload from the binary message and emit the message event with the binary payload
     * */
     private HandleBinaryDataMessage(message: CryoBuffer): void {
         const decodedDataMessage = CryoBinaryMessageFormatterFactory
@@ -127,12 +131,15 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
 
         this.HandleOutgoingBinaryMessage(encodedAckMessage);
 
+/*
         if (sender_sid !== this.sid)
+*/
             this.emit("message-binary", payload);
+/*
         else
             this.log("Dropped self-originated DATA message")
+*/
     }
-
 
     /*
     * Handle incoming binary messages

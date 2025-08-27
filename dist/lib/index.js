@@ -1,3 +1,582 @@
-"use strict";var Cryo=(()=>{var B=Object.defineProperty;var E=Object.getOwnPropertyDescriptor;var D=Object.getOwnPropertyNames;var I=Object.prototype.hasOwnProperty;var v=(a,e)=>{for(var t in e)B(a,t,{get:e[t],enumerable:!0})},_=(a,e,t,s)=>{if(e&&typeof e=="object"||typeof e=="function")for(let r of D(e))!I.call(a,r)&&r!==t&&B(a,r,{get:()=>e[r],enumerable:!(s=E(e,r))||s.enumerable});return a};var F=a=>_(B({},"__esModule",{value:!0}),a);var P={};v(P,{cryo:()=>G});var y=class{pending=new Map;Track(e,t){this.pending.set(e,t)}Confirm(e){let t=this.pending.get(e);return t?(this.pending.delete(e),t):null}Has(e){return this.pending.has(e)}};var c=class a{constructor(e){this.buffer=e;this.view=new DataView(e.buffer,e.byteOffset,e.byteLength)}view;static alloc(e){return new a(new Uint8Array(e))}static from(e,t){if(t==="utf8")return new a(new TextEncoder().encode(e));let s=new Uint8Array(e.length/2);for(let r=0;r<s.length;r++)s[r]=parseInt(e.substring(r*2,r*2+16),16);return new a(s)}writeUInt32BE(e,t){this.view.setUint32(t,e)}writeUInt8(e,t){this.view.setInt8(t,e)}readUInt32BE(e){return this.view.getUint32(e)}readUInt8(e){return this.view.getUint8(e)}write(e,t=0){this.buffer.set(new TextEncoder().encode(e),t)}set(e,t){this.buffer.set(e.buffer,t)}toString(e){return e==="utf8"?new TextDecoder().decode(this.buffer):[...this.buffer].map(t=>t.toString(16).padStart(2,"0")).join("")}subarray(e,t){return new a(this.buffer.subarray(e,t))}copy(e,t=0){e.buffer.set(this.buffer,t)}get length(){return this.buffer.byteLength}};var u=class{static sidFromCryoBuffer(e){let t=e.subarray(0,4).toString("hex"),s=e.subarray(4,6).toString("hex"),r=e.subarray(6,8).toString("hex"),n=e.subarray(8,10).toString("hex"),i=e.subarray(10,16).toString("hex");return[t,s,r,n,i].join("-")}static sidToCryoBuffer(e){return c.from(e.replaceAll("-",""),"hex")}},h=class{Deserialize(e){let t=u.sidFromCryoBuffer(e),s=e.readUInt32BE(16),r=e.readUInt8(20);if(r!==1)throw new Error("Attempt to deserialize a non-ack binary message!");return{sid:t,ack:s,type:r}}Serialize(e,t,s=null){let r=c.alloc(21);return u.sidToCryoBuffer(e).copy(r,0),r.writeUInt32BE(t,16),r.writeUInt8(1,20),r}},M=class{Deserialize(e){let t=u.sidFromCryoBuffer(e),s=e.readUInt32BE(16),r=e.readUInt8(20),n=e.subarray(21).toString("utf8");if(r!==2)throw new Error("Attempt to deserialize a non-ping_pong binary message!");if(!(n==="ping"||n==="pong"))throw new Error(`Invalid payload ${n} in ping_pong binary message!`);return{sid:t,ack:s,type:r,payload:n}}Serialize(e,t,s){let r=c.alloc(25);return u.sidToCryoBuffer(e).copy(r,0),r.writeUInt32BE(t,16),r.writeUInt8(2,20),r.write(s,21),r}},C=class{Deserialize(e){let t=u.sidFromCryoBuffer(e),s=e.readUInt32BE(16),r=e.readUInt8(20),n=e.subarray(21).toString("utf8");if(r!==0)throw new Error("Attempt to deserialize a non-data binary message!");return{sid:t,ack:s,type:r,payload:n}}Serialize(e,t,s){let r=c.alloc(21+(s?.length||4));return u.sidToCryoBuffer(e).copy(r,0),r.writeUInt32BE(t,16),r.writeUInt8(0,20),r.write(s||"null",21),r}},w=class{Deserialize(e){let t=u.sidFromCryoBuffer(e),s=e.readUInt32BE(16),r=e.readUInt8(20),n=e.subarray(21);if(r!==4)throw new Error("Attempt to deserialize a non-data binary message!");return{sid:t,ack:s,type:r,payload:n}}Serialize(e,t,s){let r=s?s.length:4,n=c.alloc(21+r);return u.sidToCryoBuffer(e).copy(n,0),n.writeUInt32BE(t,16),n.writeUInt8(0,20),n.set(s||c.from("null","utf8"),21),n}},T=class{Deserialize(e){let t=u.sidFromCryoBuffer(e),s=e.readUInt32BE(16),r=e.readUInt8(20),n=e.subarray(21).toString("utf8");if(r!==3)throw new Error("Attempt to deserialize a non-error message!");return{sid:t,ack:s,type:r,payload:n}}Serialize(e,t,s){let r=c.alloc(21+(s?.length||13));return u.sidToCryoBuffer(e).copy(r,0),r.writeUInt32BE(t,16),r.writeUInt8(3,20),r.write(s||"unknown_error",21),r}},o=class{static GetFormatter(e){switch(e){case"utf8data":case 0:return new C;case"error":case 3:return new T;case"ack":case 1:return new h;case"ping_pong":case 2:return new M;case"binarydata":case 4:return new w;default:throw new Error(`Binary message format for type '${e}' is not supported!`)}}static GetType(e){let t=e.readUInt8(20);if(t>3)throw new Error(`Unable to decode type from message ${e}. MAX_TYPE = 3, got ${t} !`);return t}static GetAck(e){return e.readUInt32BE(16)}static GetSid(e){return u.sidFromCryoBuffer(e)}static GetPayload(e,t){return e.subarray(21).toString(t)}};var S={0:"utf8data",1:"ack",2:"ping/pong",3:"error",4:"binarydata"},p=class{static Inspect(e,t="utf8"){let s=o.GetSid(e),r=o.GetAck(e),n=o.GetType(e),i=S[n]||"unknown",d=o.GetPayload(e,t);return`[${s},${r},${i},[${d}]]`}};function A(a){return localStorage.getItem("CRYO_DEBUG")?.includes(a)?(e,...t)=>{let i=(new Error().stack?.split(`
-`)?.[2]??"unknown").trim().replace(/^at\s+/,""),d=i.substring(0,i.indexOf("(")-1),b=i.substring(i.lastIndexOf(":")-2,i.length-1);console.info(`${a.padEnd(24," ")}${new Date().toISOString().padEnd(32," ")} ${d.padEnd(64," ")} ${b.padEnd(8," ")} ${e}`,...t)}:()=>{}}var l=class a extends Error{constructor(e){super(e),Object.setPrototypeOf(this,a.prototype)}},g=class a{static AgainstNull(e,t){if(e===null)throw new l(t||`Assertion failed, "param" (${e}) was null!`)}static AgainstUndefined(e,t){if(e===void 0)throw new l(t||`Assertion failed, "param" (${e}) was undefined!`)}static AgainstNullish(e,t){a.AgainstUndefined(e,t),a.AgainstNull(e,t)}static CastAs(e){a.AgainstNullish(e)}static CastAssert(e,t,s){if(a.AgainstNullish(e,s),a.AgainstNullish(t,s),!t)throw new l("Parameter assertion failed in CastAssert!")}};var f=class{target=new EventTarget;on(e,t){g.CastAs(e),this.target.addEventListener(e,s=>{t(s.detail)})}emit(e,t){g.CastAs(e),this.target.dispatchEvent(new CustomEvent(e,{detail:t}))}};var m=class a extends f{constructor(t,s,r,n,i,d=A("CRYO_CLIENT_SESSION")){super();this.host=t;this.sid=s;this.socket=r;this.timeout=n;this.bearer=i;this.log=d;this.AttachListenersToSocket(r),setTimeout(()=>this.emit("connected",void 0),0)}messages_pending_server_ack=new Map;server_ack_tracker=new y;current_ack=0;HandleOutgoingBinaryMessage(t){let s=o.GetAck(t);this.server_ack_tracker.Track(s,{timestamp:Date.now(),message:t}),this.socket&&(this.socket.send(t.buffer),this.log(`Sent ${p.Inspect(t)} to server.`))}HandlePingPongMessage(t){let s=o.GetFormatter("ping_pong"),r=s.Deserialize(t),n=s.Serialize(this.sid,r.ack,r.payload==="pong"?"ping":"pong");this.HandleOutgoingBinaryMessage(n)}HandleErrorMessage(t){let s=o.GetFormatter("error").Deserialize(t);this.log(s.payload)}async HandleAckMessage(t){let r=o.GetFormatter("ack").Deserialize(t).ack;if(!this.server_ack_tracker.Confirm(r)){this.log(`Got unknown ack_id ${r} from server.`);return}this.messages_pending_server_ack.delete(r),this.log(`Got ACK ${r} from server.`)}HandleUTF8DataMessage(t){let s=o.GetFormatter("utf8data").Deserialize(t),r=s.payload,n=s.sid,i=o.GetFormatter("ack").Serialize(this.sid,s.ack);this.HandleOutgoingBinaryMessage(i),n!==this.sid?this.emit("message-utf8",r):this.log("Dropped self-originated DATA message")}HandleBinaryDataMessage(t){let s=o.GetFormatter("binarydata").Deserialize(t),r=s.payload,n=s.sid,i=o.GetFormatter("ack").Serialize(this.sid,s.ack);this.HandleOutgoingBinaryMessage(i),n!==this.sid?this.emit("message-binary",r):this.log("Dropped self-originated DATA message")}async HandleIncomingBinaryMessage(t){let s=o.GetType(t);switch(this.log(`Received ${p.Inspect(t)} from server.`),s){case 2:this.HandlePingPongMessage(t);return;case 3:this.HandleErrorMessage(t);return;case 1:await this.HandleAckMessage(t);return;case 0:this.HandleUTF8DataMessage(t);return;case 4:this.HandleBinaryDataMessage(t);return;default:throw new Error(`Handle binary message type ${s}!`)}}async HandleError(t){this.log(`${t.name} Exception in CryoSocket: ${t.message}`),this.socket.close(1e3,`CryoSocket ${this.sid} was closed due to an error.`)}TranslateCloseCode(t){switch(t){case 1e3:return"Connection closed normally.";case 1006:return"Connection closed abnormally.";default:return"Unspecified cause for connection closure."}}async HandleClose(t,s){if(this.log(`CryoSocket was closed, code '${t}' (${this.TranslateCloseCode(t)}), reason '${s.toString("utf8")}' .`),t!==1e3){let r=0;for(this.log("Abnormal termination of Websocket connection, attempting to reconnect..."),this.socket=null,this.emit("disconnected",void 0);r<5;)try{this.socket=await a.ConstructSocket(this.host,this.timeout,this.bearer,this.sid),this.AttachListenersToSocket(this.socket),this.emit("reconnected",void 0);return}catch(n){if(n instanceof Error){let i=n.cause?.error?.code;console.warn(`Unable to reconnect to '${this.host}'. Error code: '${i}'. Retry attempt ${++r} / 5 ...`),await new Promise(d=>setTimeout(d,5e3))}}return}this.socket&&this.socket.close(),this.emit("closed",[t,s.toString("utf8")])}AttachListenersToSocket(t){t.addEventListener("message",async s=>{let r=s.data;r instanceof ArrayBuffer?await this.HandleIncomingBinaryMessage(new c(new Uint8Array(r))):this.log("Received text message instead of binary!")}),t.addEventListener("error",async s=>{await this.HandleError(new Error("Unspecified WebSocket error!"))}),t.addEventListener("close",async s=>{await this.HandleClose(s.code,new c(new TextEncoder().encode(s.reason)))})}static async ConstructSocket(t,s,r,n){let i=new URL(t);i.searchParams.set("authorization",`Bearer ${r}`),i.searchParams.set("x-cryo-sid",n);let d=new WebSocket(i);return d.binaryType="arraybuffer",new Promise((b,k)=>{setTimeout(()=>{d.readyState!==WebSocket.OPEN&&k(new Error(`Connection timeout of ${s} ms reached!`))},s),d.addEventListener("open",()=>{b(d)}),d.addEventListener("error",U=>{k(new Error("Error during session initialisation!",{cause:U}))})})}static async Connect(t,s,r=5e3){let n=crypto.randomUUID(),i=await a.ConstructSocket(t,r,s,n);return new a(t,n,i,r,s)}SendUTF8(t){let s=this.current_ack++,r=o.GetFormatter("utf8data").Serialize(this.sid,s,t);this.HandleOutgoingBinaryMessage(r)}SendBinary(t){let s=this.current_ack++,r=o.GetFormatter("binarydata").Serialize(this.sid,s,t);this.HandleOutgoingBinaryMessage(r)}get session_id(){return this.sid}Destroy(){this.socket.close()}};async function G(a,e,t=5e3){return m.Connect(a,e,t)}return F(P);})();
+"use strict";
+var Cryo = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // src/index.ts
+  var index_exports = {};
+  __export(index_exports, {
+    cryo: () => cryo
+  });
+
+  // src/Common/AckTracker/AckTracker.ts
+  var AckTracker = class {
+    pending = /* @__PURE__ */ new Map();
+    Track(ack, message) {
+      this.pending.set(ack, message);
+    }
+    Confirm(ack) {
+      const maybe_ack = this.pending.get(ack);
+      if (!maybe_ack)
+        return null;
+      this.pending.delete(ack);
+      return maybe_ack;
+    }
+    Has(ack) {
+      return this.pending.has(ack);
+    }
+  };
+
+  // src/Common/CryoBuffer/CryoBuffer.ts
+  var CryoBuffer = class _CryoBuffer {
+    constructor(buffer) {
+      this.buffer = buffer;
+      this.view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    }
+    view;
+    static alloc(length) {
+      return new _CryoBuffer(new Uint8Array(length));
+    }
+    static from(input, encoding) {
+      if (encoding === "utf8")
+        return new _CryoBuffer(new TextEncoder().encode(input));
+      const data = new Uint8Array(input.length / 2);
+      for (let i = 0; i < data.length; i++)
+        data[i] = parseInt(input.substring(i * 2, i * 2 + 2), 16);
+      return new _CryoBuffer(data);
+    }
+    writeUInt32BE(value, offset) {
+      this.view.setUint32(offset, value);
+    }
+    writeUInt8(value, offset) {
+      this.view.setUint8(offset, value);
+    }
+    readUInt32BE(offset) {
+      return this.view.getUint32(offset);
+    }
+    readUInt8(offset) {
+      return this.view.getUint8(offset);
+    }
+    write(text, offset = 0) {
+      this.buffer.set(new TextEncoder().encode(text), offset);
+    }
+    set(buffer, offset) {
+      this.buffer.set(buffer.buffer, offset);
+    }
+    toString(encoding) {
+      if (encoding === "utf8")
+        return new TextDecoder().decode(this.buffer);
+      return [...this.buffer].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+    }
+    subarray(start, end) {
+      return new _CryoBuffer(this.buffer.subarray(start, end));
+    }
+    copy(target, target_start = 0) {
+      target.buffer.set(this.buffer, target_start);
+    }
+    get length() {
+      return this.buffer.byteLength;
+    }
+  };
+
+  // src/Common/CryoBinaryMessage/CryoBinaryMessageFormatterFactory.ts
+  var CryoBufferUtil = class {
+    static sidFromCryoBuffer(CryoBuffer2) {
+      const uuidv4_p1 = CryoBuffer2.subarray(0, 4).toString("hex");
+      const uuidv4_p2 = CryoBuffer2.subarray(4, 6).toString("hex");
+      const uuidv4_p3 = CryoBuffer2.subarray(6, 8).toString("hex");
+      const uuidv4_p4 = CryoBuffer2.subarray(8, 10).toString("hex");
+      const uuidv4_p5 = CryoBuffer2.subarray(10, 16).toString("hex");
+      return [uuidv4_p1, uuidv4_p2, uuidv4_p3, uuidv4_p4, uuidv4_p5].join("-");
+    }
+    static sidToCryoBuffer(sid) {
+      return CryoBuffer.from(sid.replaceAll("-", ""), "hex");
+    }
+  };
+  var AckMessageFormatter = class {
+    Deserialize(value) {
+      const sid = CryoBufferUtil.sidFromCryoBuffer(value);
+      const ack = value.readUInt32BE(16);
+      const type = value.readUInt8(20);
+      if (type !== 1 /* ACK */)
+        throw new Error("Attempt to deserialize a non-ack binary message!");
+      return {
+        sid,
+        ack,
+        type
+      };
+    }
+    // noinspection JSUnusedLocalSymbols
+    Serialize(sid, ack, payload = null) {
+      const msg_buf = CryoBuffer.alloc(16 + 4 + 1);
+      const sid_buf = CryoBufferUtil.sidToCryoBuffer(sid);
+      sid_buf.copy(msg_buf, 0);
+      msg_buf.writeUInt32BE(ack, 16);
+      msg_buf.writeUInt8(1 /* ACK */, 20);
+      return msg_buf;
+    }
+  };
+  var PingPongMessageFormatter = class {
+    Deserialize(value) {
+      const sid = CryoBufferUtil.sidFromCryoBuffer(value);
+      const ack = value.readUInt32BE(16);
+      const type = value.readUInt8(20);
+      const payload = value.subarray(21).toString("utf8");
+      if (type !== 2 /* PING_PONG */)
+        throw new Error("Attempt to deserialize a non-ping_pong binary message!");
+      if (!(payload === "ping" || payload === "pong"))
+        throw new Error(`Invalid payload ${payload} in ping_pong binary message!`);
+      return {
+        sid,
+        ack,
+        type,
+        payload
+      };
+    }
+    Serialize(sid, ack, payload) {
+      const msg_buf = CryoBuffer.alloc(16 + 4 + 1 + 4);
+      const sid_buf = CryoBufferUtil.sidToCryoBuffer(sid);
+      sid_buf.copy(msg_buf, 0);
+      msg_buf.writeUInt32BE(ack, 16);
+      msg_buf.writeUInt8(2 /* PING_PONG */, 20);
+      msg_buf.write(payload, 21);
+      return msg_buf;
+    }
+  };
+  var UTF8DataMessageFormatter = class {
+    Deserialize(value) {
+      const sid = CryoBufferUtil.sidFromCryoBuffer(value);
+      const ack = value.readUInt32BE(16);
+      const type = value.readUInt8(20);
+      const payload = value.subarray(21).toString("utf8");
+      if (type !== 0 /* UTF8DATA */)
+        throw new Error("Attempt to deserialize a non-data binary message!");
+      return {
+        sid,
+        ack,
+        type,
+        payload
+      };
+    }
+    Serialize(sid, ack, payload) {
+      const msg_buf = CryoBuffer.alloc(16 + 4 + 1 + (payload?.length || 4));
+      const sid_buf = CryoBufferUtil.sidToCryoBuffer(sid);
+      sid_buf.copy(msg_buf, 0);
+      msg_buf.writeUInt32BE(ack, 16);
+      msg_buf.writeUInt8(0 /* UTF8DATA */, 20);
+      msg_buf.write(payload || "null", 21);
+      return msg_buf;
+    }
+  };
+  var BinaryDataMessageFormatter = class {
+    Deserialize(value) {
+      const sid = CryoBufferUtil.sidFromCryoBuffer(value);
+      const ack = value.readUInt32BE(16);
+      const type = value.readUInt8(20);
+      const payload = value.subarray(21);
+      if (type !== 4 /* BINARYDATA */)
+        throw new Error("Attempt to deserialize a non-data binary message!");
+      return {
+        sid,
+        ack,
+        type,
+        payload
+      };
+    }
+    Serialize(sid, ack, payload) {
+      const payload_length = payload ? payload.length : 4;
+      const msg_buf = CryoBuffer.alloc(16 + 4 + 1 + payload_length);
+      const sid_buf = CryoBufferUtil.sidToCryoBuffer(sid);
+      sid_buf.copy(msg_buf, 0);
+      msg_buf.writeUInt32BE(ack, 16);
+      msg_buf.writeUInt8(0 /* UTF8DATA */, 20);
+      msg_buf.set(payload || CryoBuffer.from("null", "utf8"), 21);
+      return msg_buf;
+    }
+  };
+  var ErrorMessageFormatter = class {
+    Deserialize(value) {
+      const sid = CryoBufferUtil.sidFromCryoBuffer(value);
+      const ack = value.readUInt32BE(16);
+      const type = value.readUInt8(20);
+      const payload = value.subarray(21).toString("utf8");
+      if (type !== 3 /* ERROR */)
+        throw new Error("Attempt to deserialize a non-error message!");
+      return {
+        sid,
+        ack,
+        type,
+        payload
+      };
+    }
+    Serialize(sid, ack, payload) {
+      const msg_buf = CryoBuffer.alloc(16 + 4 + 1 + (payload?.length || 13));
+      const sid_buf = CryoBufferUtil.sidToCryoBuffer(sid);
+      sid_buf.copy(msg_buf, 0);
+      msg_buf.writeUInt32BE(ack, 16);
+      msg_buf.writeUInt8(3 /* ERROR */, 20);
+      msg_buf.write(payload || "unknown_error", 21);
+      return msg_buf;
+    }
+  };
+  var CryoBinaryMessageFormatterFactory = class {
+    static GetFormatter(type) {
+      switch (type) {
+        case "utf8data":
+        case 0 /* UTF8DATA */:
+          return new UTF8DataMessageFormatter();
+        case "error":
+        case 3 /* ERROR */:
+          return new ErrorMessageFormatter();
+        case "ack":
+        case 1 /* ACK */:
+          return new AckMessageFormatter();
+        case "ping_pong":
+        case 2 /* PING_PONG */:
+          return new PingPongMessageFormatter();
+        case "binarydata":
+        case 4 /* BINARYDATA */:
+          return new BinaryDataMessageFormatter();
+        default:
+          throw new Error(`Binary message format for type '${type}' is not supported!`);
+      }
+    }
+    static GetType(message) {
+      const type = message.readUInt8(20);
+      if (type > 3 /* ERROR */)
+        throw new Error(`Unable to decode type from message ${message}. MAX_TYPE = 3, got ${type} !`);
+      return type;
+    }
+    static GetAck(message) {
+      return message.readUInt32BE(16);
+    }
+    static GetSid(message) {
+      return CryoBufferUtil.sidFromCryoBuffer(message);
+    }
+    static GetPayload(message, encoding) {
+      return message.subarray(21).toString(encoding);
+    }
+  };
+
+  // src/Common/CryoFrameInspector/CryoFrameInspector.ts
+  var typeToStringMap = {
+    0: "utf8data",
+    1: "ack",
+    2: "ping/pong",
+    3: "error",
+    4: "binarydata"
+  };
+  var CryoFrameInspector = class {
+    static Inspect(message, encoding = "utf8") {
+      const sid = CryoBinaryMessageFormatterFactory.GetSid(message);
+      const ack = CryoBinaryMessageFormatterFactory.GetAck(message);
+      const type = CryoBinaryMessageFormatterFactory.GetType(message);
+      const type_str = typeToStringMap[type] || "unknown";
+      const payload = CryoBinaryMessageFormatterFactory.GetPayload(message, encoding);
+      return `[${sid},${ack},${type_str},[${payload}]]`;
+    }
+  };
+
+  // src/Common/Util/CreateDebugLogger.ts
+  function CreateDebugLogger(section) {
+    if (localStorage.getItem("CRYO_DEBUG")?.includes(section)) {
+      return (msg, ...params) => {
+        const err = new Error();
+        const stack = err.stack?.split("\n");
+        const caller_line = stack?.[2] ?? "unknown";
+        const method_cleaned = caller_line.trim().replace(/^at\s+/, "");
+        const method = method_cleaned.substring(0, method_cleaned.indexOf("(") - 1);
+        const position = method_cleaned.substring(method_cleaned.lastIndexOf(":") - 2, method_cleaned.length - 1);
+        console.info(`${section.padEnd(24, " ")}${(/* @__PURE__ */ new Date()).toISOString().padEnd(32, " ")} ${method.padEnd(64, " ")} ${position.padEnd(8, " ")} ${msg}`, ...params);
+      };
+    }
+    return () => {
+    };
+  }
+
+  // src/Common/Util/Guard.ts
+  var GuardError = class _GuardError extends Error {
+    constructor(pMessage) {
+      super(pMessage);
+      Object.setPrototypeOf(this, _GuardError.prototype);
+    }
+  };
+  var Guard = class _Guard {
+    //wenn "param" === null, throw with "message"
+    static AgainstNull(param, message) {
+      if (param === null)
+        throw new GuardError(message ? message : `Assertion failed, "param" (${param}) was null!`);
+    }
+    //Wenn "param" === "undefined", throw with "message"
+    static AgainstUndefined(param, message) {
+      if (param === void 0)
+        throw new GuardError(message ? message : `Assertion failed, "param" (${param}) was undefined!`);
+    }
+    //Wenn "param" === "null" or "param" === "undefined", throw with "message"
+    static AgainstNullish(param, message) {
+      _Guard.AgainstUndefined(param, message);
+      _Guard.AgainstNull(param, message);
+    }
+    //Typ von "param" als Typ "T" interpretieren
+    static CastAs(param) {
+      _Guard.AgainstNullish(param);
+    }
+    //Typ von "param" als Typ "T" interpretieren und "param" und "expr" gegen "null" und "undefined" guarden
+    static CastAssert(param, expr, message) {
+      _Guard.AgainstNullish(param, message);
+      _Guard.AgainstNullish(expr, message);
+      if (!expr)
+        throw new GuardError(`Parameter assertion failed in CastAssert!`);
+    }
+  };
+
+  // src/Common/CryoEventEmitter/CryoEventEmitter.ts
+  var CryoEventEmitter = class {
+    target = new EventTarget();
+    on(type, listener) {
+      Guard.CastAs(type);
+      this.target.addEventListener(type, (e) => {
+        listener(e.detail);
+      });
+    }
+    emit(type, payload) {
+      Guard.CastAs(type);
+      this.target.dispatchEvent(new CustomEvent(type, { detail: payload }));
+    }
+  };
+
+  // src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts
+  var CryoClientWebsocketSession = class _CryoClientWebsocketSession extends CryoEventEmitter {
+    constructor(host, sid, socket, timeout, bearer, log = CreateDebugLogger("CRYO_CLIENT_SESSION")) {
+      super();
+      this.host = host;
+      this.sid = sid;
+      this.socket = socket;
+      this.timeout = timeout;
+      this.bearer = bearer;
+      this.log = log;
+      this.AttachListenersToSocket(socket);
+      setTimeout(() => this.emit("connected", void 0), 0);
+    }
+    messages_pending_server_ack = /* @__PURE__ */ new Map();
+    server_ack_tracker = new AckTracker();
+    current_ack = 0;
+    /*
+    * Handle an outgoing binary message
+    * */
+    HandleOutgoingBinaryMessage(message) {
+      const message_ack = CryoBinaryMessageFormatterFactory.GetAck(message);
+      this.server_ack_tracker.Track(message_ack, {
+        timestamp: Date.now(),
+        message
+      });
+      if (!this.socket)
+        return;
+      this.socket.send(message.buffer);
+      this.log(`Sent ${CryoFrameInspector.Inspect(message)} to server.`);
+    }
+    /*
+    * Respond to PONG frames with PING and vice versa
+    * */
+    HandlePingPongMessage(message) {
+      const pingFormatter = CryoBinaryMessageFormatterFactory.GetFormatter("ping_pong");
+      const decodedPingPongMessage = pingFormatter.Deserialize(message);
+      const ping_pongMessage = pingFormatter.Serialize(this.sid, decodedPingPongMessage.ack, decodedPingPongMessage.payload === "pong" ? "ping" : "pong");
+      this.HandleOutgoingBinaryMessage(ping_pongMessage);
+    }
+    /*
+    * Handling of binary error messages from the server, currently just log it
+    * */
+    HandleErrorMessage(message) {
+      const decodedErrorMessage = CryoBinaryMessageFormatterFactory.GetFormatter("error").Deserialize(message);
+      this.log(decodedErrorMessage.payload);
+    }
+    /*
+    * Locally ACK the pending message if it matches the server's ACK
+    * */
+    async HandleAckMessage(message) {
+      const decodedAckMessage = CryoBinaryMessageFormatterFactory.GetFormatter("ack").Deserialize(message);
+      const ack_id = decodedAckMessage.ack;
+      const found_message = this.server_ack_tracker.Confirm(ack_id);
+      if (!found_message) {
+        this.log(`Got unknown ack_id ${ack_id} from server.`);
+        return;
+      }
+      this.messages_pending_server_ack.delete(ack_id);
+      this.log(`Got ACK ${ack_id} from server.`);
+    }
+    /*
+    * Extract payload from the binary message and emit the message event with the utf8 payload
+    * */
+    HandleUTF8DataMessage(message) {
+      const decodedDataMessage = CryoBinaryMessageFormatterFactory.GetFormatter("utf8data").Deserialize(message);
+      const payload = decodedDataMessage.payload;
+      const sender_sid = decodedDataMessage.sid;
+      const encodedAckMessage = CryoBinaryMessageFormatterFactory.GetFormatter("ack").Serialize(this.sid, decodedDataMessage.ack);
+      this.HandleOutgoingBinaryMessage(encodedAckMessage);
+      this.emit("message-utf8", payload);
+    }
+    /*
+    * Extract payload from the binary message and emit the message event with the binary payload
+    * */
+    HandleBinaryDataMessage(message) {
+      const decodedDataMessage = CryoBinaryMessageFormatterFactory.GetFormatter("binarydata").Deserialize(message);
+      const payload = decodedDataMessage.payload;
+      const sender_sid = decodedDataMessage.sid;
+      const encodedAckMessage = CryoBinaryMessageFormatterFactory.GetFormatter("ack").Serialize(this.sid, decodedDataMessage.ack);
+      this.HandleOutgoingBinaryMessage(encodedAckMessage);
+      this.emit("message-binary", payload);
+    }
+    /*
+    * Handle incoming binary messages
+    * */
+    async HandleIncomingBinaryMessage(message) {
+      const message_type = CryoBinaryMessageFormatterFactory.GetType(message);
+      this.log(`Received ${CryoFrameInspector.Inspect(message)} from server.`);
+      switch (message_type) {
+        case 2 /* PING_PONG */:
+          this.HandlePingPongMessage(message);
+          return;
+        case 3 /* ERROR */:
+          this.HandleErrorMessage(message);
+          return;
+        case 1 /* ACK */:
+          await this.HandleAckMessage(message);
+          return;
+        case 0 /* UTF8DATA */:
+          this.HandleUTF8DataMessage(message);
+          return;
+        case 4 /* BINARYDATA */:
+          this.HandleBinaryDataMessage(message);
+          return;
+        default:
+          throw new Error(`Handle binary message type ${message_type}!`);
+      }
+    }
+    async HandleError(err) {
+      this.log(`${err.name} Exception in CryoSocket: ${err.message}`);
+      this.socket.close(1e3, `CryoSocket ${this.sid} was closed due to an error.`);
+    }
+    TranslateCloseCode(code) {
+      switch (code) {
+        case 1e3:
+          return "Connection closed normally.";
+        case 1006:
+          return "Connection closed abnormally.";
+        default:
+          return "Unspecified cause for connection closure.";
+      }
+    }
+    async HandleClose(code, reason) {
+      this.log(`CryoSocket was closed, code '${code}' (${this.TranslateCloseCode(code)}), reason '${reason.toString("utf8")}' .`);
+      if (code !== 1e3) {
+        let current_attempt = 0;
+        this.log(`Abnormal termination of Websocket connection, attempting to reconnect...`);
+        this.socket = null;
+        this.emit("disconnected", void 0);
+        while (current_attempt < 5) {
+          try {
+            this.socket = await _CryoClientWebsocketSession.ConstructSocket(this.host, this.timeout, this.bearer, this.sid);
+            this.AttachListenersToSocket(this.socket);
+            this.emit("reconnected", void 0);
+            return;
+          } catch (ex) {
+            if (ex instanceof Error) {
+              const errorCode = ex.cause?.error?.code;
+              console.warn(`Unable to reconnect to '${this.host}'. Error code: '${errorCode}'. Retry attempt ${++current_attempt} / 5 ...`);
+              await new Promise((resolve) => setTimeout(resolve, 5e3));
+            }
+          }
+        }
+        return;
+      }
+      if (this.socket)
+        this.socket.close();
+      this.emit("closed", [code, reason.toString("utf8")]);
+    }
+    AttachListenersToSocket(socket) {
+      socket.addEventListener("message", async (message_event) => {
+        const raw_data = message_event.data;
+        if (raw_data instanceof ArrayBuffer) {
+          await this.HandleIncomingBinaryMessage(new CryoBuffer(new Uint8Array(raw_data)));
+        } else {
+          this.log("Received text message instead of binary!");
+        }
+      });
+      socket.addEventListener("error", async (error_event) => {
+        await this.HandleError(new Error("Unspecified WebSocket error!"));
+      });
+      socket.addEventListener("close", async (close_event) => {
+        await this.HandleClose(close_event.code, new CryoBuffer(new TextEncoder().encode(close_event.reason)));
+      });
+    }
+    static async ConstructSocket(host, timeout, bearer, sid) {
+      const full_host_url = new URL(host);
+      full_host_url.searchParams.set("authorization", `Bearer ${bearer}`);
+      full_host_url.searchParams.set("x-cryo-sid", sid);
+      const sck = new WebSocket(full_host_url);
+      sck.binaryType = "arraybuffer";
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (sck.readyState !== WebSocket.OPEN)
+            reject(new Error(`Connection timeout of ${timeout} ms reached!`));
+        }, timeout);
+        sck.addEventListener("open", () => {
+          resolve(sck);
+        });
+        sck.addEventListener("error", (err) => {
+          reject(new Error(`Error during session initialisation!`, { cause: err }));
+        });
+      });
+    }
+    static async Connect(host, bearer, timeout = 5e3) {
+      const sid = crypto.randomUUID();
+      const socket = await _CryoClientWebsocketSession.ConstructSocket(host, timeout, bearer, sid);
+      return new _CryoClientWebsocketSession(host, sid, socket, timeout, bearer);
+    }
+    /*
+    * Send an utf8 message to the server
+    * */
+    SendUTF8(message) {
+      const new_ack_id = this.current_ack++;
+      const formatted_message = CryoBinaryMessageFormatterFactory.GetFormatter("utf8data").Serialize(this.sid, new_ack_id, message);
+      this.HandleOutgoingBinaryMessage(formatted_message);
+    }
+    /*
+    * Send a binary message to the server
+    * */
+    SendBinary(message) {
+      const new_ack_id = this.current_ack++;
+      const formatted_message = CryoBinaryMessageFormatterFactory.GetFormatter("binarydata").Serialize(this.sid, new_ack_id, message);
+      this.HandleOutgoingBinaryMessage(formatted_message);
+    }
+    get session_id() {
+      return this.sid;
+    }
+    Destroy() {
+      this.socket.close();
+    }
+  };
+
+  // src/index.ts
+  async function cryo(host, bearer, timeout = 5e3) {
+    return CryoClientWebsocketSession.Connect(host, bearer, timeout);
+  }
+  return __toCommonJS(index_exports);
+})();
 //# sourceMappingURL=index.js.map

@@ -8,7 +8,7 @@ await build({
     globalName: "Cryo",
     platform: "browser",
     sourcemap: true,
-    minify: true,
+    minify: false,
     legalComments: "inline",
     treeShaking: true
 })
