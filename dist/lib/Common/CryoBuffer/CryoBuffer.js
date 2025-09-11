@@ -1,84 +1,65 @@
 export class CryoBuffer {
-    private view: DataView;
-
-    public constructor(public buffer: Uint8Array) {
+    buffer;
+    view;
+    constructor(buffer) {
+        this.buffer = buffer;
         this.view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
     }
-
-    public static alloc(length: number): CryoBuffer {
+    static alloc(length) {
         return new CryoBuffer(new Uint8Array(length));
     }
-
-    public static from(input: string, encoding?: "utf8" | "hex"): CryoBuffer {
+    static from(input, encoding) {
         if (encoding === "utf8")
             return new CryoBuffer(new TextEncoder().encode(input));
-
         const data = new Uint8Array(input.length / 2);
         for (let i = 0; i < data.length; i++)
             data[i] = parseInt(input.substring(i * 2, i * 2 + 2), 16);
-
         return new CryoBuffer(data);
     }
-
-    public static concat(buffers: CryoBuffer[]): CryoBuffer {
+    static concat(buffers) {
         if (buffers.length === 0)
             return CryoBuffer.alloc(0);
-
-        const length_total = buffers.reduce((acc, v) => acc + v.length, 0)
+        const length_total = buffers.reduce((acc, v) => acc + v.length, 0);
         const result = new Uint8Array(length_total);
-
         let offset = 0;
         for (const buf of buffers) {
             result.set(buf.buffer, offset);
             offset += buf.length;
         }
-
         return new CryoBuffer(result);
     }
-
-
-    public writeUInt32BE(value: number, offset: number): void {
+    writeUInt32BE(value, offset) {
         this.view.setUint32(offset, value);
     }
-
-    public writeUInt8(value: number, offset: number): void {
+    writeUInt8(value, offset) {
         this.view.setUint8(offset, value);
     }
-
-    public readUInt32BE(offset: number): number {
+    readUInt32BE(offset) {
         return this.view.getUint32(offset);
     }
-
-    public readUInt8(offset: number): number {
+    readUInt8(offset) {
         return this.view.getUint8(offset);
     }
-
-    public write(text: string, offset: number = 0): void {
+    write(text, offset = 0) {
         this.buffer.set(new TextEncoder().encode(text), offset);
     }
-
-    public set(buffer: CryoBuffer, offset: number): void {
+    set(buffer, offset) {
         this.buffer.set(buffer.buffer, offset);
     }
-
-    public toString(encoding: "utf8" | "hex"): string {
+    toString(encoding) {
         if (encoding === "utf8")
             return new TextDecoder().decode(this.buffer);
-
         return [...this.buffer]
             .map(byte => byte.toString(16).padStart(2, "0"))
             .join("");
     }
-
-    public subarray(start: number, end?: number): CryoBuffer {
+    subarray(start, end) {
         return new CryoBuffer(this.buffer.subarray(start, end));
     }
-
-    public copy(target: CryoBuffer, target_start = 0): void {
+    copy(target, target_start = 0) {
         target.buffer.set(this.buffer, target_start);
     }
-
-    public get length(): number {
+    get length() {
         return this.buffer.byteLength;
     }
 }

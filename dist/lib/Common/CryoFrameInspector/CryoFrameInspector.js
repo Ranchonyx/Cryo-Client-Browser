@@ -1,6 +1,4 @@
 import CryoFrameFormatter from "../CryoBinaryMessage/CryoFrameFormatter.js";
-import {CryoBuffer} from "../CryoBuffer/CryoBuffer.js";
-
 const typeToStringMap = {
     0: "ack",
     1: "error",
@@ -10,17 +8,14 @@ const typeToStringMap = {
     5: "server_hello",
     6: "client_hello",
     7: "handshake_done",
-}
-
+};
 export class CryoFrameInspector {
-    public static Inspect(message: CryoBuffer, encoding: "utf8" | "hex" = "utf8"): string {
+    static Inspect(message, encoding = "utf8") {
         const sid = CryoFrameFormatter.GetSid(message);
         const ack = CryoFrameFormatter.GetAck(message);
         const type = CryoFrameFormatter.GetType(message);
         const type_str = typeToStringMap[type] || "unknown";
-
         const payload = CryoFrameFormatter.GetPayload(message, encoding);
-
-        return `[${sid},${ack},${type_str},[${payload}]]`
+        return `[${sid},${ack},${type_str},[${payload}]]`;
     }
 }

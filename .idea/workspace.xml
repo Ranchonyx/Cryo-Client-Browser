@@ -5,15 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="885f51e0-5033-41af-998e-a7f0e6dd43cb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoCryptoBox.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoFrameRouter.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoHandshakeEngine.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/build.mjs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/lib/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/lib/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/lib/index.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/lib/index.js.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Common/DebugLogger/CreateDebugLogger.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/typings/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/dist/typings/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Common/CryoBinaryMessage/CryoBinaryMessageFormatterFactory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Common/CryoBinaryMessage/CryoFrameFormatter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Common/CryoBuffer/CryoBuffer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Common/CryoBuffer/CryoBuffer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Common/CryoFrameInspector/CryoFrameInspector.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/Common/CryoFrameInspector/CryoFrameInspector.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Util/Guard.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,8 +28,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript File" />
         <option value="JavaScript File" />
+        <option value="HTML File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -38,12 +44,16 @@
   &quot;associatedIndex&quot;: 2
 }</component>
   <component name="ProjectId" id="300SkKJwdBcs8aFtDAW8kumNqIv" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
@@ -106,6 +116,23 @@
       <workItem from="1753351219756" duration="71000" />
       <workItem from="1753355427166" duration="28000" />
       <workItem from="1753355473239" duration="124000" />
+      <workItem from="1756288230442" duration="138000" />
+      <workItem from="1756715260658" duration="1703000" />
+      <workItem from="1756974520153" duration="2106000" />
+      <workItem from="1756976723357" duration="30000" />
+      <workItem from="1756976783317" duration="9000" />
+      <workItem from="1756976804628" duration="2782000" />
+      <workItem from="1756979713144" duration="267000" />
+      <workItem from="1756980005221" duration="1063000" />
+      <workItem from="1756984878199" duration="45000" />
+      <workItem from="1756985233209" duration="116000" />
+      <workItem from="1756985808825" duration="900000" />
+      <workItem from="1757427900209" duration="15000" />
+      <workItem from="1757428179665" duration="1316000" />
+      <workItem from="1757574650618" duration="3721000" />
+      <workItem from="1757578850357" duration="328000" />
+      <workItem from="1757579425580" duration="839000" />
+      <workItem from="1757581629434" duration="6000" />
     </task>
     <servers />
   </component>
