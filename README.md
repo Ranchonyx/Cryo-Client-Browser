@@ -1,4 +1,4 @@
-# Cryo-Client-Node
+# Cryo-Client-browser
 
 #### Part of the Cryo Ecosystem
 
@@ -26,7 +26,7 @@ Client implementations are available for:
 
 A server implementation is available for **TypeScript / JavaScript** under **Node.Js**
 
-## Cryo-Client-Node / Overview
+## Cryo-Client-Browser / Overview
 
 The Cryo Browser client takes care of the following:
 
@@ -38,7 +38,7 @@ It provides access incoming communication via events
 
 ## Setup
 
-To set up a Cryo Client, simply import the ``cryo`` function from the ``cryo-client-node`` package.
+To set up a Cryo Client, simply import the ``cryo`` function from the ``cryo-client-browser`` package.
 
 The ``cryo``-function takes two arguments:
 
@@ -83,7 +83,7 @@ This category of events is emitted when the session state changes
 ## Cryo-Client / Example
 
 ```typescript
-import {cryo} from "cryo-client-node";
+import {cryo} from "cryo-client-browser";
 
 const HOST = "localhost:8080";
 const TOKEN = process.env.CRYO_AUTH_TOKEN;
