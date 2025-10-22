@@ -179,6 +179,9 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     * Handle an outgoing binary message
     * */
     private async HandleOutgoingBinaryMessage(outgoing_message: CryoBuffer): Promise<void> {
+        if (this.socket.readyState === WebSocket.CLOSING || this.socket.readyState === WebSocket.CLOSED)
+            return;
+
         //Create a pending message with a new ack number and queue it for acknowledgement by the server
         const type = CryoFrameFormatter.GetType(outgoing_message);
         if (type === BinaryMessageType.UTF8DATA || type === BinaryMessageType.BINARYDATA) {
@@ -307,39 +310,39 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     }
 
     private async HandleClose(code: number, reason: Buffer) {
-        this.log(`Websocket was closed. Code=${code} (${this.TranslateCloseCode(code)}), reason=${reason.toString("utf8")}.`);
+        console.warn(`Websocket was closed. Code=${code} (${this.TranslateCloseCode(code)}), reason=${reason.toString("utf8")}.`);
 
-        if (code !== CloseCode.CLOSE_GRACEFUL) {
-            let current_attempt = 0;
-            let back_off_delay = 5000;
+        if (code !== CloseCode.CLOSE_SERVER_ERROR)
+            return;
 
-            //If the connection was not normally closed, try to reconnect
-            this.log(`Abnormal termination of Websocket connection, attempting to reconnect...`);
-            ///@ts-expect-error
-            this.socket = null;
+        let current_attempt = 0;
+        let back_off_delay = 5000;
 
-            this.emit("disconnected", undefined)
-            while (current_attempt < 5) {
-                try {
-                    this.socket = await CryoClientWebsocketSession.ConstructSocket(this.host, this.timeout, this.bearer, this.sid);
-                    this.AttachListenersToSocket(this.socket);
+        //If the connection was not normally closed, try to reconnect
+        console.error(`Abnormal termination of Websocket connection, attempting to reconnect...`);
+        ///@ts-expect-error
+        this.socket = null;
 
-                    this.emit("reconnected", undefined);
-                    return;
-                } catch (ex) {
-                    if (ex instanceof Error) {
-                        ///@ts-expect-error
-                        const errorCode = ex.cause?.error?.code as string;
-                        console.warn(`Unable to reconnect to '${this.host}'. Error code: '${errorCode}'. Retry attempt in ${back_off_delay} ms. Attempt ${current_attempt++} / 5`);
-                        await new Promise((resolve) => setTimeout(resolve, back_off_delay));
-                        back_off_delay += current_attempt * 1000;
-                    }
+        this.emit("disconnected", undefined)
+        while (current_attempt < 5) {
+            try {
+                this.socket = await CryoClientWebsocketSession.ConstructSocket(this.host, this.timeout, this.bearer, this.sid);
+                this.AttachListenersToSocket(this.socket);
+
+                this.emit("reconnected", undefined);
+                return;
+            } catch (ex) {
+                if (ex instanceof Error) {
+                    ///@ts-expect-error
+                    const errorCode = ex.cause?.error?.code as string;
+                    console.warn(`Unable to reconnect to '${this.host}'. Error code: '${errorCode}'. Retry attempt in ${back_off_delay} ms. Attempt ${current_attempt++} / 5`);
+                    await new Promise((resolve) => setTimeout(resolve, back_off_delay));
+                    back_off_delay += current_attempt * 1000;
                 }
             }
-
-            console.warn(`Gave up on reconnecting to '${this.host}'`)
-            return;
         }
+
+        console.error(`Gave up on reconnecting to '${this.host}'`);
 
         if (this.socket)
             this.socket.close();
