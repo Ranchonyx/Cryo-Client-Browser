@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="885f51e0-5033-41af-998e-a7f0e6dd43cb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,6 +56,9 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;File.Encoding&quot;,
     &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\f.janetzki\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;stardust.markdown.MarkdownSplitEditorSuppressor:keyList&quot;: []
   }
 }</component>
   <component name="RecentsManager">
@@ -126,7 +128,16 @@
       <workItem from="1757591482180" duration="1581000" />
       <workItem from="1757681321297" duration="12000" />
       <workItem from="1757685557945" duration="7000" />
-      <workItem from="1761133078206" duration="705000" />
+      <workItem from="1761133078206" duration="798000" />
+      <workItem from="1761136846481" duration="10000" />
+      <workItem from="1761136871585" duration="4000" />
+      <workItem from="1761136888550" duration="1000" />
+      <workItem from="1761136913194" duration="4000" />
+      <workItem from="1761137226192" duration="4000" />
+      <workItem from="1762177627894" duration="6000" />
+      <workItem from="1762252230668" duration="11000" />
+      <workItem from="1762252263756" duration="6000" />
+      <workItem from="1762252274535" duration="1000" />
     </task>
     <servers />
   </component>

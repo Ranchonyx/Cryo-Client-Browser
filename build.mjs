@@ -4,7 +4,7 @@ await build({
     entryPoints: ["src/index.ts"],
     bundle: true,
     outfile: "dist/lib/index.js",
-    format: "iife",
+    format: "esm",
     globalName: "Cryo",
     platform: "browser",
     sourcemap: true,
