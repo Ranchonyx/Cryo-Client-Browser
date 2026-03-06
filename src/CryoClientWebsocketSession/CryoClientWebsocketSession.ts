@@ -32,7 +32,7 @@ function once<T extends keyof WebSocketEventMap>(socket: WebSocket, type: T, han
 /*
 * Cryo Websocket session layer. Handles Binary formatting and ACKs and whatnot
 * */
-export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebsocketSessionEvents> implements CryoClientWebsocketSession {
+export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebsocketSessionEvents> {
     private messages_pending_server_ack = new Map<number, PendingBinaryMessage>();
     private server_ack_tracker: AckTracker = new AckTracker();
     private current_ack = 0;
@@ -310,10 +310,7 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     }
 
     private async HandleClose(code: number, reason: Buffer) {
-        console.warn(`Websocket was closed. Code=${code} (${this.TranslateCloseCode(code)}), reason=${reason.toString("utf8")}.`);
-
-        if (code !== CloseCode.CLOSE_SERVER_ERROR)
-            return;
+        this.log(`Websocket was closed. Code=${code} (${this.TranslateCloseCode(code)}), reason=${reason.toString("utf8")}.`);
 
         let current_attempt = 0;
         let back_off_delay = 5000;
@@ -335,14 +332,14 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
                 if (ex instanceof Error) {
                     ///@ts-expect-error
                     const errorCode = ex.cause?.error?.code as string;
-                    console.warn(`Unable to reconnect to '${this.host}'. Error code: '${errorCode}'. Retry attempt in ${back_off_delay} ms. Attempt ${current_attempt++} / 5`);
+                    this.log(`Unable to reconnect to '${this.host}'. Error code: '${errorCode}'. Retry attempt in ${back_off_delay} ms. Attempt ${current_attempt++} / 5`);
                     await new Promise((resolve) => setTimeout(resolve, back_off_delay));
                     back_off_delay += current_attempt * 1000;
                 }
             }
         }
 
-        console.error(`Gave up on reconnecting to '${this.host}'`);
+        this.log(`Gave up on reconnecting to '${this.host}'`);
 
         if (this.socket)
             this.socket.close();

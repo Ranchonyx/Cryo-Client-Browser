@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="885f51e0-5033-41af-998e-a7f0e6dd43cb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,6 +139,13 @@
       <workItem from="1762252230668" duration="11000" />
       <workItem from="1762252263756" duration="6000" />
       <workItem from="1762252274535" duration="1000" />
+      <workItem from="1762325638470" duration="89000" />
+      <workItem from="1762326104745" duration="4000" />
+      <workItem from="1762510115796" duration="103000" />
+      <workItem from="1772634902734" duration="43000" />
+      <workItem from="1772635020838" duration="8000" />
+      <workItem from="1772635067495" duration="5000" />
+      <workItem from="1772635114674" duration="51000" />
     </task>
     <servers />
   </component>
