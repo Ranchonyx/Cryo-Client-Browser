@@ -24,7 +24,6 @@ export class CryoHandshakeEngine {
         this.formatter = formatter;
         this.next_ack = next_ack;
         this.events = events;
-        this.init_keys();
     }
     async init_keys() {
         try {
@@ -36,6 +35,8 @@ export class CryoHandshakeEngine {
         }
     }
     async on_server_hello(frame) {
+        if (!this.ecdh)
+            await this.init_keys();
         if (this.handshake_state !== HandshakeState.WAIT_SERVER_HELLO) {
             this.events.onFailure(`CLIENT_HELLO received while in state ${this.handshake_state}`);
             return;
@@ -48,7 +49,10 @@ export class CryoHandshakeEngine {
             this.events.onFailure("Local ECDH private key not initialised.");
             return;
         }
-        const secret = await crypto.subtle.deriveBits({ name: "ECDH", public: server_pub_key }, this.ecdh.privateKey, 256);
+        const secret = await crypto.subtle.deriveBits({
+            name: "ECDH",
+            public: server_pub_key
+        }, this.ecdh.privateKey, 256);
         const hash = new Uint8Array(await crypto.subtle.digest("SHA-256", secret));
         this.transmit_key = new CryoBuffer(hash.subarray(16, 32));
         this.receive_key = new CryoBuffer(hash.subarray(0, 16));

@@ -179,6 +179,9 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
     * Handle an outgoing binary message
     * */
     private async HandleOutgoingBinaryMessage(outgoing_message: CryoBuffer): Promise<void> {
+        if (!this.socket)
+            return;
+
         if (this.socket.readyState === WebSocket.CLOSING || this.socket.readyState === WebSocket.CLOSED)
             return;
 
@@ -192,15 +195,12 @@ export class CryoClientWebsocketSession extends CryoEventEmitter<ICryoClientWebs
             });
         }
 
-        //Send the message buffer to the server
-        if (!this.socket)
-            return;
-
         let message = outgoing_message;
         if (this.use_cale && this.secure) {
             message = await this.crypto!.encrypt(outgoing_message);
         }
 
+        //Send the message buffer to the server
         try {
             this.socket.send(message.buffer);
         } catch (ex) {

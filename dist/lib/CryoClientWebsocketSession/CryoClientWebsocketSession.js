@@ -153,6 +153,10 @@ export class CryoClientWebsocketSession extends CryoEventEmitter {
     * Handle an outgoing binary message
     * */
     async HandleOutgoingBinaryMessage(outgoing_message) {
+        if (!this.socket)
+            return;
+        if (this.socket.readyState === WebSocket.CLOSING || this.socket.readyState === WebSocket.CLOSED)
+            return;
         //Create a pending message with a new ack number and queue it for acknowledgement by the server
         const type = CryoFrameFormatter.GetType(outgoing_message);
         if (type === BinaryMessageType.UTF8DATA || type === BinaryMessageType.BINARYDATA) {
@@ -162,13 +166,11 @@ export class CryoClientWebsocketSession extends CryoEventEmitter {
                 message: outgoing_message
             });
         }
-        //Send the message buffer to the server
-        if (!this.socket)
-            return;
         let message = outgoing_message;
         if (this.use_cale && this.secure) {
             message = await this.crypto.encrypt(outgoing_message);
         }
+        //Send the message buffer to the server
         try {
             this.socket.send(message.buffer);
         }
@@ -257,34 +259,31 @@ export class CryoClientWebsocketSession extends CryoEventEmitter {
     }
     async HandleClose(code, reason) {
         this.log(`Websocket was closed. Code=${code} (${this.TranslateCloseCode(code)}), reason=${reason.toString("utf8")}.`);
-        if (code !== CloseCode.CLOSE_GRACEFUL) {
-            let current_attempt = 0;
-            let back_off_delay = 5000;
-            //If the connection was not normally closed, try to reconnect
-            this.log(`Abnormal termination of Websocket connection, attempting to reconnect...`);
-            ///@ts-expect-error
-            this.socket = null;
-            this.emit("disconnected", undefined);
-            while (current_attempt < 5) {
-                try {
-                    this.socket = await CryoClientWebsocketSession.ConstructSocket(this.host, this.timeout, this.bearer, this.sid);
-                    this.AttachListenersToSocket(this.socket);
-                    this.emit("reconnected", undefined);
-                    return;
-                }
-                catch (ex) {
-                    if (ex instanceof Error) {
-                        ///@ts-expect-error
-                        const errorCode = ex.cause?.error?.code;
-                        console.warn(`Unable to reconnect to '${this.host}'. Error code: '${errorCode}'. Retry attempt in ${back_off_delay} ms. Attempt ${current_attempt++} / 5`);
-                        await new Promise((resolve) => setTimeout(resolve, back_off_delay));
-                        back_off_delay += current_attempt * 1000;
-                    }
+        let current_attempt = 0;
+        let back_off_delay = 5000;
+        //If the connection was not normally closed, try to reconnect
+        console.error(`Abnormal termination of Websocket connection, attempting to reconnect...`);
+        ///@ts-expect-error
+        this.socket = null;
+        this.emit("disconnected", undefined);
+        while (current_attempt < 5) {
+            try {
+                this.socket = await CryoClientWebsocketSession.ConstructSocket(this.host, this.timeout, this.bearer, this.sid);
+                this.AttachListenersToSocket(this.socket);
+                this.emit("reconnected", undefined);
+                return;
+            }
+            catch (ex) {
+                if (ex instanceof Error) {
+                    ///@ts-expect-error
+                    const errorCode = ex.cause?.error?.code;
+                    this.log(`Unable to reconnect to '${this.host}'. Error code: '${errorCode}'. Retry attempt in ${back_off_delay} ms. Attempt ${current_attempt++} / 5`);
+                    await new Promise((resolve) => setTimeout(resolve, back_off_delay));
+                    back_off_delay += current_attempt * 1000;
                 }
             }
-            console.warn(`Gave up on reconnecting to '${this.host}'`);
-            return;
         }
+        this.log(`Gave up on reconnecting to '${this.host}'`);
         if (this.socket)
             this.socket.close();
         this.emit("closed", [code, reason.toString("utf8")]);

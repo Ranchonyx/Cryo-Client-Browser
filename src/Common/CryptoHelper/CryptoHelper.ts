@@ -18,7 +18,7 @@ export class PerSessionCryptoHelper {
         return iv;
     }
 
-    public async encrypt(plain: Uint8Array): Promise<Uint8Array> {
+    public async encrypt(plain: Uint8Array<ArrayBufferLike>): Promise<Uint8Array> {
         this.log(`[ENCRYPT]\nlen=${plain.length}\nnonce=${this.nonce}\nfirst16=${new CryoBuffer(plain.subarray(0, 16)).toString("hex")}`);
 
         const iv = this.createIV();
