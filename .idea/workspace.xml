@@ -5,22 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="885f51e0-5033-41af-998e-a7f0e6dd43cb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/Common/AckTracker/AckTracker.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/Common/CryoBinaryMessage/CryoFrameFormatter.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/Common/CryoBuffer/CryoBuffer.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/Common/CryoEventEmitter/CryoEventEmitter.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/Common/CryoFrameInspector/CryoFrameInspector.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/Common/CryptoHelper/CryptoHelper.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/Common/Util/CreateDebugLogger.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/Common/Util/Guard.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/CryoClientWebsocketSession/CryoClientWebsocketSession.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/CryoClientWebsocketSession/CryoCryptoBox.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/CryoClientWebsocketSession/CryoFrameRouter.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/lib/CryoClientWebsocketSession/CryoHandshakeEngine.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/dist/lib/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/dist/lib/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/CryoClientWebsocketSession/CryoClientWebsocketSession.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dist/lib/index.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/dist/lib/index.js.map" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +148,7 @@
       <workItem from="1772635114674" duration="51000" />
       <workItem from="1772785949625" duration="248000" />
       <workItem from="1773216793182" duration="19000" />
-      <workItem from="1773847140678" duration="375000" />
+      <workItem from="1773847140678" duration="612000" />
     </task>
     <servers />
   </component>
